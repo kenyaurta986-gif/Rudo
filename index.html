@@ -2,210 +2,77 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>System Check</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Special Surprise 😏</title>
     <style>
         body {
-            background-color: black;
-            color: lime;
-            font-family: 'Courier New', monospace;
-            margin: 0;
-            padding: 20px;
-            overflow: hidden;
+            background: linear-gradient(to bottom, #000428, #004e92);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
             height: 100vh;
-            width: 100vw;
-            user-select: none; /* Makes text uncopyable */
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE10+/Edge */
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
-        #terminal {
-            white-space: pre-wrap;
-            line-height: 1.5;
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px cyan, 0 0 30px blue;
         }
-        .blink {
-            animation: blink 1s steps(2, start) infinite;
+        p {
+            font-size: 1.8em;
+            margin-bottom: 60px;
         }
-        @keyframes blink {
-            to { visibility: hidden; }
+        button {
+            background-color: #ff00ff;
+            color: white;
+            font-size: 2.5em;
+            padding: 30px 60px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s;
         }
-        #overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+        button:hover {
+            transform: scale(1.1);
+            background-color: #ff66ff;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .sparkle {
+            position: absolute;
             width: 100%;
             height: 100%;
-            z-index: 9999;
-            background: transparent;
-            display: none;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 10%, transparent 10%);
+            background-size: 50px 50px;
+            animation: sparkle 20s linear infinite;
+        }
+        @keyframes sparkle {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
         }
     </style>
 </head>
 <body>
-    <div id="overlay"></div>
-    <div id="terminal"></div>
+    <div class="sparkle"></div>
+    <h1>You Won't Believe This...</h1>
+    <p>Click the button for an epic surprise video!</p>
+    <button onclick="rickroll()">▶ CLICK HERE NOW</button>
 
     <script>
-        const terminal = document.getElementById('terminal');
-        const overlay = document.getElementById('overlay');
-        
-        const lines = [
-            "Initializing system scan...",
-            "Accessing device information...",
-            "IP Address: 192.168.1." + Math.floor(Math.random() * 255),
-            "Device: " + navigator.platform,
-            "Browser: " + navigator.userAgent.split(' ')[0],
-            "Breaching firewall",
-            "Injecting payload",
-            "Accessing camera and microphone",
-            "Downloading personal files",
-            "Encrypting data",
-            "Tracing location",
-            "HACK COMPLETE",
-            "",
-            "YOUR DEVICE HAS BEEN HACKED!!!",
-            "All files encrypted. Send 1 BTC to save them."
-        ];
-
-        let i = 0;
-        let lineIndex = 0;
-        let flashingInterval;
-        let freezeTimeout;
-        let fullscreenInterval;
-
-        function typeLine() {
-            if (lineIndex >= lines.length) {
-                terminal.innerHTML += '<br><span class="blink">_</span>';
-                return;
-            }
-
-            const currentLine = lines[lineIndex];
-            
-            if (i < currentLine.length) {
-                terminal.innerHTML += currentLine.charAt(i);
-                i++;
-                setTimeout(typeLine, 20 + Math.random() * 50); // Faster typing speed
-            } else {
-                terminal.innerHTML += '<br>';
-                if (currentLine.includes(".")) {
-                    let dots = 0;
-                    const dotInterval = setInterval(() => {
-                        terminal.innerHTML += '.';
-                        dots++;
-                        if (dots >= 3) {
-                            clearInterval(dotInterval);
-                            terminal.innerHTML += '<br>';
-                            i = 0;
-                            lineIndex++;
-                            typeLine();
-                        }
-                    }, 300); // Faster dots
-                } else {
-                    i = 0;
-                    lineIndex++;
-                    setTimeout(typeLine, 500); // Faster line transitions
-                }
-            }
-
-            // Trigger the freeze + flash when "HACK COMPLETE" finishes
-            if (currentLine === "HACK COMPLETE") {
-                setTimeout(startFreezeAndFlash, 1000);
-            }
+        function rickroll() {
+            // Opens the classic Rickroll with auto-play!
+            window.open('https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0', '_blank');
         }
-
-        function enterFullscreen() {
-            const elem = document.documentElement;
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen().catch(() => {});
-            } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-            } else if (elem.mozRequestFullScreen) {
-                elem.mozRequestFullScreen();
-            } else if (elem.msRequestFullscreen) {
-                elem.msRequestFullscreen();
-            }
-        }
-
-        function isFullscreen() {
-            return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-        }
-
-        function startFreezeAndFlash() {
-            enterFullscreen();
-
-            // Force re-enter fullscreen if exited
-            fullscreenInterval = setInterval(() => {
-                if (!isFullscreen()) {
-                    enterFullscreen();
-                }
-            }, 100); // Check every 100ms
-
-            // Prevent back navigation during freeze
-            history.pushState(null, null, location.href);
-            window.onpopstate = () => {
-                history.pushState(null, null, location.href);
-                enterFullscreen(); // Force back to fullscreen on back attempt
-            };
-
-            // Block unload/leave attempts
-            window.onbeforeunload = () => "System locked - cannot exit.";
-
-            // Show invisible overlay to block all input
-            overlay.style.display = 'block';
-
-            // Block all possible user interactions (unmovable screen)
-            const blockEvent = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            };
-
-            ['touchstart', 'touchmove', 'touchend', 'touchcancel',
-             'mousedown', 'mousemove', 'mouseup', 'click', 'dblclick',
-             'keydown', 'keyup', 'keypress', 'scroll', 'wheel', 'gesturestart',
-             'gesturechange', 'gestureend'].forEach(evt => {
-                window.addEventListener(evt, blockEvent, { passive: false, capture: true });
-            });
-
-            // Rapid background flashing (stronger, faster)
-            let isBlack = true;
-            flashingInterval = setInterval(() => {
-                document.body.style.backgroundColor = isBlack ? 'white' : 'black';
-                isBlack = !isBlack;
-            }, 1);
-
-            // Stop everything after 20 seconds
-            freezeTimeout = setTimeout(() => {
-                clearInterval(flashingInterval);
-                clearInterval(fullscreenInterval);
-                document.body.style.backgroundColor = 'black';
-                overlay.style.display = 'none';
-
-                // Remove event blockers
-                ['touchstart', 'touchmove', 'touchend', 'touchcancel',
-                 'mousedown', 'mousemove', 'mouseup', 'click', 'dblclick',
-                 'keydown', 'keyup', 'keypress', 'scroll', 'wheel', 'gesturestart',
-                 'gesturechange', 'gestureend'].forEach(evt => {
-                    window.removeEventListener(evt, blockEvent, { passive: false, capture: true });
-                });
-
-                // Allow exit/back after freeze
-                window.onpopstate = null;
-                window.onbeforeunload = null;
-
-                // Exit fullscreen
-                if (document.exitFullscreen) document.exitFullscreen();
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-                else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-                else if (document.msExitFullscreen) document.msExitFullscreen();
-            }, 20000); // 20 seconds
-        }
-
-        // Start the typing animation
-        setTimeout(() => {
-            terminal.innerHTML = '> ';
-            typeLine();
-        }, 500); // Faster start
     </script>
 </body>
 </html>
