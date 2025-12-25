@@ -3,76 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Special Surprise 😏</title>
+    <title>Surprise Loading...</title>
+    <meta http-equiv="refresh" content="0; url=https://www.youtube.com/watch?v=dQw4w9WgXcQ&autoplay=1">
     <style>
         body {
-            background: linear-gradient(to bottom, #000428, #004e92);
-            color: white;
-            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: #0f0;
+            font-family: monospace;
             text-align: center;
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-        h1 {
-            font-size: 3.5em;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px cyan, 0 0 30px blue;
-        }
-        p {
-            font-size: 1.8em;
-            margin-bottom: 60px;
-        }
-        button {
-            background-color: #ff00ff;
-            color: white;
-            font-size: 2.5em;
-            padding: 30px 60px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-            transition: all 0.3s;
-        }
-        button:hover {
-            transform: scale(1.1);
-            background-color: #ff66ff;
-        }
-        button:active {
-            transform: scale(0.95);
-        }
-        .sparkle {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 10%, transparent 10%);
-            background-size: 50px 50px;
-            animation: sparkle 20s linear infinite;
-        }
-        @keyframes sparkle {
-            0% { background-position: 0 0; }
-            100% { background-position: 50px 50px; }
+            padding-top: 40vh;
         }
     </style>
 </head>
 <body>
-    <div class="sparkle"></div>
-    <h1>You Won't Believe This...</h1>
-    <p>Click the button for an epic surprise video!</p>
-    <button onclick="rickroll()">▶ CLICK HERE NOW</button>
+    <h1>Loading epic video...</h1>
+    <p>If not redirected, <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&autoplay=1" style="color:lime;">click here</a></p>
 
     <script>
-        function rickroll() {
-            // Opens the classic Rickroll with auto-play!
-            window.open('https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0', '_blank');
-        }
+        // Backup JavaScript redirect (in case meta doesn't fire instantly)
+        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ&autoplay=1";
     </script>
 </body>
 </html>
